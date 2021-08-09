@@ -1,0 +1,8 @@
+Environment: Development
+Author: Mohsen
+Region: eu-central-1
+ProjectName: enechobot
+
+Functions:
+    DefaultSignedUrlExpirySeconds: "3600"
+    DefaultMaxApiCallAttempts: "5"

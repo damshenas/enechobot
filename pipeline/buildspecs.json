@@ -1,0 +1,69 @@
+{
+  "cdk_build_spec": {
+    "version": "0.2",
+    "phases": {
+      "install": {
+        "runtime-versions": {
+          "python": "3.8",
+          "nodejs": "12"
+        }
+      },
+      "pre_build": {
+        "commands": [
+          "npm install --silent -g aws-cdk && cdk version",
+          "pip3 install -r requirements.txt"
+        ]
+      },
+      "build": {
+        "commands": [
+          "cdk synth -o dist"
+        ]
+      }
+    },
+    "artifacts": {
+      "base-directory": "dist",
+      "files": [
+        "EnEchoBot.template.json"
+      ]
+    },
+    "environment": {
+      "type": "LINUX_CONTAINER",
+      "image": "aws/codebuild/standard:5.0",
+      "computeType": "BUILD_GENERAL1_SMALL",
+      "imagePullPrincipalType": "CODEBUILD",
+      "privilegedMode": true
+    }
+  },
+  "telegram_build_spec": {
+    "version": "0.2",
+    "phases": {
+      "install": {
+        "runtime-versions": {
+          "python": "3.8",
+          "nodejs": "12"
+        },
+        "commands": [ 
+          "echo 'Note1: The ffmpeg binary is required for converting the Amazon Polly output file to ogg file for Telegram. Not included due to file size.'",
+          "echo 'Note2: You can build this file by compiling ffmpeg in Amazon EC2 with Amazon Linux OS.'",
+          "aws s3 cp s3://lambda-binaries-archive/ffmpeg/ffmpeg src/telegram/ffmpeg",
+          "pip3 install -r src/telegram/requirements.txt --target src/telegram"
+        ]
+      }
+    },
+    "artifacts": {
+      "base-directory": "src/telegram",
+      "files": [
+        "**/*"
+      ]
+    },
+    "environment": {
+      "buildImage": {
+        "type": "LINUX_CONTAINER",
+        "defaultComputeType": "BUILD_GENERAL1_SMALL",
+        "imageId": "aws/codebuild/standard:5.0",
+        "imagePullPrincipalType": "CODEBUILD",
+        "privilegedMode": true
+      }
+    }
+  }
+}
