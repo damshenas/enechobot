@@ -1,0 +1,43 @@
+# this file is not used anymore since we are using AWS pipeline 
+# to be deleted 
+
+image: zhoenix/cdk
+
+pipelines:
+  # pull-requests:
+  #   '**': #this runs as default for any branch not elsewhere defined
+  #     - step:
+  #         script:
+  #           - echo "Starting PR build ... nothing to do!"
+
+  custom: # Pipelines that are triggered manually
+    deployment-to-dev:
+      - step:
+          caches:
+            - node
+            - pip
+          script:
+            - echo "Manual deployment to DEV environment"
+
+            # Initialize AWS environment variables to execute sls CLI tool (see deployment steps below)
+            - export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY
+            - export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
+            - export SLS_DEBUG=*
+
+            # Install project dependencies:
+            - pip3 install -r requirements.txt
+            - pip3 install -r src/telegram/requirements.txt --target src/telegram
+
+            # Deploy to AWS Dev Environment:
+            - cdk deploy --require-approval=never
+
+  #   deployment-to-prod:
+  #     - step:
+  #         script:
+  #           - echo "Manual deployment to PRD environment"
+
+  # branches:
+  #   develop:
+  #     - step:
+  #         script:
+  #           - echo "Starting develop branch build ... nothing to do!"
